@@ -17,6 +17,8 @@ import (
 	"gitlab.praktikum-services.ru/Stasyan/momo-store/internal/logger"
 )
 
+const defaultHTTPAddr = ":8081"
+
 func main() {
 	logger.Setup()
 
@@ -27,7 +29,9 @@ func main() {
 }
 
 func run() error {
-	lis, err := net.Listen("tcp", ":8081")
+	addr := getEnv("HTTP_ADDR", defaultHTTPAddr)
+
+	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
@@ -54,7 +58,7 @@ func run() error {
 
 	errChan := make(chan error, 1)
 	go func() {
-		logger.Log.Info("starting HTTP server", zap.String("address", ":8081"))
+		logger.Log.Info("starting HTTP server", zap.String("address", addr))
 		if err := srv.Serve(lis); err != nil {
 			errChan <- fmt.Errorf("error serving HTTP: %w", err)
 		}
@@ -74,4 +78,12 @@ func run() error {
 	case err := <-errChan:
 		return err
 	}
+}
+
+func getEnv(key, fallback string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+
+	return fallback
 }

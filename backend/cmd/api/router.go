@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,7 +18,7 @@ func newRouter(app *app.Instance) (http.Handler, error) {
 	r := chi.NewRouter()
 
 	corses := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   allowedOrigins(),
 		AllowCredentials: true,
 	})
 
@@ -53,4 +55,26 @@ func logMiddleware(next http.Handler) http.Handler {
 		)
 		next.ServeHTTP(w, r)
 	})
+}
+
+func allowedOrigins() []string {
+	rawOrigins := os.Getenv("ALLOWED_ORIGINS")
+	if rawOrigins == "" {
+		return []string{"*"}
+	}
+
+	origins := strings.Split(rawOrigins, ",")
+	filtered := make([]string, 0, len(origins))
+	for _, origin := range origins {
+		origin = strings.TrimSpace(origin)
+		if origin != "" {
+			filtered = append(filtered, origin)
+		}
+	}
+
+	if len(filtered) == 0 {
+		return []string{"*"}
+	}
+
+	return filtered
 }

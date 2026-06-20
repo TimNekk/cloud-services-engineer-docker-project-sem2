@@ -3,7 +3,8 @@ ARG ALPINE_VERSION=3.24
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS deps
 WORKDIR /src
-RUN apk add --no-cache ca-certificates wget
+RUN apk upgrade --no-cache \
+  && apk add --no-cache ca-certificates wget
 
 COPY go.mod go.sum ./
 RUN go mod download
@@ -20,6 +21,7 @@ CMD ["go", "run", "./cmd/api"]
 
 FROM alpine:${ALPINE_VERSION} AS runtime
 RUN addgroup -S app && adduser -S -G app app \
+  && apk upgrade --no-cache \
   && apk add --no-cache ca-certificates wget
 
 WORKDIR /app

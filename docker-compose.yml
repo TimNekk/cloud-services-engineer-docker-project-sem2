@@ -76,7 +76,7 @@ services:
           memory: 32M
 
   api-gateway:
-    image: nginxinc/nginx-unprivileged:1.27-alpine
+    image: nginxinc/nginx-unprivileged:1.27.3-alpine3.20
     depends_on:
       backend:
         condition: service_healthy

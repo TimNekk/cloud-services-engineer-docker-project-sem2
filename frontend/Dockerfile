@@ -1,9 +1,10 @@
 ARG NODE_VERSION=16.20.2
 
-FROM node:${NODE_VERSION}-alpine AS deps
+FROM node:${NODE_VERSION}-alpine3.18 AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN apk upgrade --no-cache \
+  && npm ci
 
 FROM deps AS builder
 ARG VUE_APP_API_URL=/api
@@ -19,9 +20,12 @@ COPY . .
 EXPOSE 8080
 CMD ["npm", "run", "serve", "--", "--host", "0.0.0.0", "--port", "8080"]
 
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.27.3-alpine3.20 AS runtime
+USER root
+RUN apk upgrade --no-cache
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
+USER 101
 
 EXPOSE 8080
 

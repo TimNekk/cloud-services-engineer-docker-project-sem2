@@ -1,5 +1,5 @@
-ARG GO_VERSION=1.25.7
-ARG ALPINE_VERSION=3.20
+ARG GO_VERSION=1.25.11
+ARG ALPINE_VERSION=3.24
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS deps
 WORKDIR /src
@@ -20,7 +20,7 @@ CMD ["go", "run", "./cmd/api"]
 
 FROM alpine:${ALPINE_VERSION} AS runtime
 RUN addgroup -S app && adduser -S -G app app \
-    && apk add --no-cache ca-certificates wget
+  && apk add --no-cache ca-certificates wget
 
 WORKDIR /app
 COPY --from=builder /out/momo-api /app/momo-api

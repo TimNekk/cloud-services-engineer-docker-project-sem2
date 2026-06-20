@@ -112,6 +112,39 @@ services:
           cpus: "0.10"
           memory: 16M
 
+  backend-dev:
+    profiles: ["dev"]
+    build:
+      context: ./backend
+      target: development
+    image: momo-store/backend:dev
+    environment:
+      HTTP_ADDR: :8081
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    networks:
+      - backend
+
+  frontend-dev:
+    profiles: ["dev"]
+    build:
+      context: ./frontend
+      target: development
+    image: momo-store/frontend:dev
+    environment:
+      VUE_APP_API_URL: http://localhost:8081
+      VUE_APP_PUBLIC_PATH: /
+    depends_on:
+      - backend-dev
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - backend
+      - public
+
 networks:
   public:
     driver: bridge

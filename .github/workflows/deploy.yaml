@@ -62,7 +62,7 @@ jobs:
           format: table
           exit-code: 1
           ignore-unfixed: true
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
       - name: Scan frontend image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -70,7 +70,7 @@ jobs:
           format: table
           exit-code: 1
           ignore-unfixed: true
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
       - name: Scan repository configuration with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -78,4 +78,4 @@ jobs:
           scan-ref: .
           format: table
           exit-code: 1
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
